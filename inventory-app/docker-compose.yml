@@ -1,0 +1,77 @@
+services:
+  # PHP FPM Service
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: laravel-react-app
+    depends_on:
+      db:
+        condition: service_healthy
+    container_name: laravel_app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - laravel
+
+  # Nginx Service
+  nginx:
+    image: nginx:latest
+    container_name: laravel_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      # - "443:443"
+    volumes:
+      - ./:/var/www
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+    networks:
+      - laravel
+    depends_on:
+      - app
+
+  # MySQL Service
+  db:
+    image: mysql:8.0
+    container_name: laravel_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-laravel}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-secret}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
+      MYSQL_USER: ${DB_USERNAME:-laravel}
+    volumes:
+      - dbdata:/var/lib/mysql
+    networks:
+      - laravel
+    healthcheck:
+      test: ["CMD", "mysqldump", "-u${DB_USERNAME:-laravel}", "-p${DB_PASSWORD:-secret}", "--no-data", "${DB_DATABASE:-laravel}"]
+      retries: 3
+      timeout: 20s
+
+  # Node Service (for npm dev server)
+  # node:
+    # image: node:18-alpine
+    # container_name: laravel_node
+    # restart: unless-stopped
+    # working_dir: /var/www
+    # volumes:
+    #   - ./:/var/www
+    # ports:
+    #   - "5173:5173"
+    # networks:
+    #   - laravel
+    # command: npm run dev 
+ 
+networks:
+  laravel:
+    driver: bridge
+
+volumes:
+  dbdata:
+    driver: local
+
+    
