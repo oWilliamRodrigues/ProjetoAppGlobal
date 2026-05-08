@@ -3,6 +3,9 @@ FROM php:8.4-fpm
 # Set working directory
 WORKDIR /var/www
 
+ARG UID=1000
+ARG GID=1000
+
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
@@ -27,6 +30,11 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg
 
 # Install PHP extensions
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
+
+RUN groupadd -g ${GID} dev \
+    && useradd -u ${UID} -g dev -m -s /bin/bash dev
+
+USER dev
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
