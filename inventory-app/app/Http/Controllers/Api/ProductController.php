@@ -20,7 +20,7 @@ class ProductController extends Controller
         $perPage = max(1, min($perPage, 100));
 
         $products = Product::query()
-            ->orderBy('name')
+            ->orderBy('title')
             ->paginate($perPage);
 
         return response()->json($products);

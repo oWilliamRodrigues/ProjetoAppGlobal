@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('image_url')->nullable();
             $table->decimal('rating_rate', 2, 1)->nullable();
             $table->unsignedInteger('rating_count')->nullable();
+            $table->unsignedInteger('stock_quantity')->default(0);
             $table->softdeletes();
             $table->timestamps();
         });

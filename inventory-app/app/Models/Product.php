@@ -2,27 +2,24 @@
 
 namespace App\Models;
 
-<<<<<<< adam
-=======
 use Database\Factories\ProductFactory;
->>>>>>> feat/Fundacao
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
-<<<<<<< adam
-    /** @use HasFactory<\Database\Factories\ProductFactory> */
-    use HasFactory;
-=======
     /** @use HasFactory<ProductFactory> */
     use HasFactory;
 
     protected $fillable = [
-        'sku',
-        'name',
+        'external_id',
+        'title',
         'description',
         'price',
+        'category',
+        'image_url',
+        'rating_rate',
+        'rating_count',
         'stock_quantity',
     ];
 
@@ -31,7 +28,8 @@ class Product extends Model
         return [
             'price' => 'decimal:2',
             'stock_quantity' => 'integer',
+            'rating_rate' => 'decimal:1',
+            'rating_count' => 'integer',
         ];
     }
->>>>>>> feat/Fundacao
 }
