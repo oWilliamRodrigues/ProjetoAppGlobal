@@ -2,19 +2,12 @@
 
 namespace App\Models;
 
-<<<<<<< adam
-=======
 use Database\Factories\ProductFactory;
->>>>>>> feat/Fundacao
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
-<<<<<<< adam
-    /** @use HasFactory<\Database\Factories\ProductFactory> */
-    use HasFactory;
-=======
     /** @use HasFactory<ProductFactory> */
     use HasFactory;
 
@@ -33,5 +26,4 @@ class Product extends Model
             'stock_quantity' => 'integer',
         ];
     }
->>>>>>> feat/Fundacao
 }

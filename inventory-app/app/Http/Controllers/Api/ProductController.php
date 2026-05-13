@@ -54,4 +54,19 @@ class ProductController extends Controller
 
         return response()->json(['product' => $updated]);
     }
+
+    public function syncFromApi(): JsonResponse
+    {
+        $response = $this->api->get('/products');
+
+        if ($response === false) {
+            return response()->json(['message' => 'Falha ao buscar produtos da API externa.'], 502);
+        }
+        
+        $data = json_decode($response, true);
+
+        Product::whereNotIn('external_id', collect($data)->pluck('id'))->delete();
+
+        return response()->json(['message' => 'Produtos sincronizados com sucesso.']);
+    }
 }
