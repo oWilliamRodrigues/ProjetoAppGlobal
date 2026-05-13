@@ -9,18 +9,25 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use App\Services\Api;
 
 class ProductController extends Controller
 {
+    public function __construct(private readonly Api $api) {
+       
+    }
     public function index(Request $request): JsonResponse
     {
         $this->authorize('viewAny', Product::class);
 
-        $perPage = (int) $request->integer('per_page', 15);
-        $perPage = max(1, min($perPage, 100));
+        $default = (int) config('api.pagination.default_per_page');
+        $max = (int) config('api.pagination.max_per_page');
+
+        $perPage = (int) $request->integer('per_page', $default);
+        $perPage = max(1, min($perPage, $max));
 
         $products = Product::query()
-            ->orderBy('name')
+            ->orderBy('title')
             ->paginate($perPage);
 
         return response()->json($products);
@@ -64,6 +71,22 @@ class ProductController extends Controller
         }
         
         $data = json_decode($response, true);
+        
+        foreach ($data as $product) {
+            Product::updateOrCreate(
+                ['external_id' => $product['id']],
+                [
+                    'external_id' => $product['id'],
+                    'title' => $product['title'],
+                    'price' => $product['price'],
+                    'description' => $product['description'],
+                    'category' => $product['category'],
+                    'image' => $product['image'],
+                    'rating_rate' => $product['rating']['rate'] ?? null,
+                    'rating_count' => $product['rating']['count'] ?? null,
+                ]
+            );
+        }
 
         Product::whereNotIn('external_id', collect($data)->pluck('id'))->delete();
 
