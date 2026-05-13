@@ -13,12 +13,21 @@ class AuthController extends Controller
     {
         $request->authenticate();
 
+<<<<<<< adam
         $user = $request->authenticate();
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'user' => $user->only(['id', 'name', 'email', 'role']),
+=======
+        $user = $request->user();
+
+        $token = $user->createToken('api-token')->plainTextToken;
+
+        return response()->json([
+            'user' => $request->user()->only(['id', 'name', 'email']),
+>>>>>>> feat/Fundacao
             'token' => $token,
         ]);
     }
@@ -27,7 +36,7 @@ class AuthController extends Controller
     {
         $request->user()->currentAccessToken()->delete();
 
-        return response()->json(['message' => 'Logout efetuado.']);
+        return response()->json(['message' => 'Logged out']);
     }
 
     public function me(Request $request): JsonResponse
