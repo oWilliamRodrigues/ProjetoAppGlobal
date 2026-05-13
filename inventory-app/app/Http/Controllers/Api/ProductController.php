@@ -9,22 +9,20 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
-use App\Services\Api;
+use App\Services\ProductSyncService;
 
 class ProductController extends Controller
 {
-    public function __construct(private readonly Api $api) {
-       
+    public function __construct(private readonly ProductSyncService $sync)
+    {
     }
     public function index(Request $request): JsonResponse
     {
         $this->authorize('viewAny', Product::class);
 
         $default = (int) config('api.pagination.default_per_page');
-        $max = (int) config('api.pagination.max_per_page');
 
         $perPage = (int) $request->integer('per_page', $default);
-        $perPage = max(1, min($perPage, $max));
 
         $products = Product::query()
             ->orderBy('title')
@@ -64,32 +62,16 @@ class ProductController extends Controller
 
     public function syncFromApi(): JsonResponse
     {
-        $response = $this->api->get('/products');
+        dd("coiso");
+        try {
+            $stats = $this->sync->sync();
 
-        if ($response === false) {
-            return response()->json(['message' => 'Falha ao buscar produtos da API externa.'], 502);
+            return response()->json([
+                'message' => 'Produtos sincronizados com sucesso.',
+                'stats' => $stats,
+            ]);
+        } catch (\RuntimeException $e) {
+            return response()->json(['message' => $e->getMessage()], 502);
         }
-        
-        $data = json_decode($response, true);
-        
-        foreach ($data as $product) {
-            Product::updateOrCreate(
-                ['external_id' => $product['id']],
-                [
-                    'external_id' => $product['id'],
-                    'title' => $product['title'],
-                    'price' => $product['price'],
-                    'description' => $product['description'],
-                    'category' => $product['category'],
-                    'image' => $product['image'],
-                    'rating_rate' => $product['rating']['rate'] ?? null,
-                    'rating_count' => $product['rating']['count'] ?? null,
-                ]
-            );
-        }
-
-        Product::whereNotIn('external_id', collect($data)->pluck('id'))->delete();
-
-        return response()->json(['message' => 'Produtos sincronizados com sucesso.']);
     }
 }

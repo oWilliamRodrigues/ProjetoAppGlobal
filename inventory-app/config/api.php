@@ -14,6 +14,5 @@ return [
     'url' => env('API_URL', 'https://fakestoreapi.com'),
     'pagination' => [
         'default_per_page' => (int) env('DEFAULT_PER_PAGE', 15),
-        'max_per_page' => (int) env('MAX_PER_PAGE', 100),
     ],
 ];

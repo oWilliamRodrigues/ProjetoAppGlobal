@@ -8,6 +8,9 @@ Route::post('/login', [AuthController::class, 'login'])
     ->middleware('throttle:6,1')
     ->name('api.login');
 
+    Route::get('teste', function() {
+        return response()->json(['message' => 'API is working']);
+    });
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthController::class, 'me'])->name('api.me');
     Route::post('/logout', [AuthController::class, 'logout'])->name('api.logout');
