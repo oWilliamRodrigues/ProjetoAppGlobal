@@ -7,20 +7,20 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
-{
+{ 
     /** @use HasFactory<ProductFactory> */
     use HasFactory;
 
     protected $fillable = [
         'external_id',
         'title',
-        'description',
         'price',
+        'description',
         'category',
-        'image_url',
+        'image',
+        'stock_quantity',
         'rating_rate',
         'rating_count',
-        'stock_quantity',
     ];
 
     protected function casts(): array
