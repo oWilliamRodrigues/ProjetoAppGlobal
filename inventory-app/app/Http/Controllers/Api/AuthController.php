@@ -11,14 +11,12 @@ class AuthController extends Controller
 {
     public function login(LoginRequest $request): JsonResponse
     {
-        $request->authenticate();
-
-        $user = $request->user();
+        $user = $request->authenticate();
 
         $token = $user->createToken('api-token')->plainTextToken;
 
         return response()->json([
-            'user' => $request->user()->only(['id', 'name', 'email']),
+            'user' => $user->only(['id', 'name', 'email']),
             'token' => $token,
         ]);
     }

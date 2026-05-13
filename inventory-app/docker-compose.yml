@@ -56,18 +56,18 @@ services:
       timeout: 20s
 
   # Node Service (for npm dev server)
-  # node:
-    # image: node:18-alpine
-    # container_name: laravel_node
-    # restart: unless-stopped
-    # working_dir: /var/www
-    # volumes:
-    #   - ./:/var/www
-    # ports:
-    #   - "5173:5173"
-    # networks:
-    #   - laravel
-    # command: npm run dev 
+  node:
+    image: node:20-alpine
+    container_name: laravel_node
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+     - ./:/var/www
+    ports:
+       - "5173:5173"
+    networks:
+       - laravel
+    command: sh -c "npm install  --legacy-peer-deps && npm run dev -- --host 0.0.0.0" 
  
 networks:
   laravel:
