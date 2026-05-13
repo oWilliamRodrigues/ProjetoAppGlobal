@@ -2,6 +2,9 @@ services:
   # PHP FPM Service
   app:
     build:
+      args:
+          UID: ${UID:-1000}
+          GID: ${GID:-1000}
       context: .
       dockerfile: Dockerfile
     image: laravel-react-app
