@@ -4,11 +4,25 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ProductController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/login', [AuthController::class, 'login'])
+Route::group([
+
+    'middleware' => 'api',
+    'prefix' => 'auth'
+
+], function ($router) {
+
+    Route::post('login', 'AuthController@login');
+    Route::post('logout', 'AuthController@logout');
+    Route::post('refresh', 'AuthController@refresh');
+    Route::post('me', 'AuthController@me');
+
+});
+
+Route::post('/login', [AuthController::class, 'login'])
     ->middleware('throttle:6,1')
     ->name('api.login');
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware('auth:api')->group(function () {
     Route::get('/me', [AuthController::class, 'me'])->name('api.me');
     Route::post('/logout', [AuthController::class, 'logout'])->name('api.logout');
 

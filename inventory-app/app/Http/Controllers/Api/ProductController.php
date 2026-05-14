@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Products\UpdateStockRequest;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -13,30 +12,34 @@ use App\Services\ProductSyncService;
 
 class ProductController extends Controller
 {
-    public function __construct(private readonly ProductSyncService $sync) {
-        
+    public function __construct(private readonly ProductSyncService $sync)
+    {
     }
+    
     public function index(Request $request): JsonResponse
     {
         $this->authorize('viewAny', Product::class);
 
         $default = (int) config('api.pagination.default_per_page');
-        $max = (int) config('api.pagination.max_per_page');
 
         $perPage = (int) $request->integer('per_page', $default);
-        $perPage = max(1, min($perPage, $max));
+        $search = $request->query('search');
 
         $products = Product::query()
             ->orderBy('title')
-            ->paginate($perPage);
+            ->when($search, function ($query) use ($search) {
+                $query->where('title', 'like', "%{$search}%");
+            })
+            ->paginate($perPage)
+            ->appends($request->only('search', 'per_page'));
 
         return response()->json($products);
     }
 
-    public function updateStock(UpdateStockRequest $request, Product $product): JsonResponse
+    public function updateStock(Request $request, Product $product): JsonResponse
     {
-        $op = $request->validated('operation');
-        $qty = (int) $request->validated('quantity');
+        $op = $request->validate('operation');
+        $qty = (int) $request->validate('quantity');
 
         $updated = DB::transaction(function () use ($product, $op, $qty) {
             $fresh = Product::lockForUpdate()->findOrFail($product->id);
