@@ -67,7 +67,7 @@ services:
        - "5173:5173"
     networks:
        - laravel
-    command: sh -c "npm install  --legacy-peer-deps && npm run dev -- --host 0.0.0.0" 
+    command: sh -c "npm install --legacy-peer-deps && npm run dev -- --host 127.0.0.1" 
  
 networks:
   laravel:

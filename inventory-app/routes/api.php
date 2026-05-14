@@ -4,7 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ProductController;
 use Illuminate\Support\Facades\Route;
 
-Route::post('/login', [AuthController::class, 'login'])
+Route::get('/login', [AuthController::class, 'login'])
     ->middleware('throttle:6,1')
     ->name('api.login');
 
