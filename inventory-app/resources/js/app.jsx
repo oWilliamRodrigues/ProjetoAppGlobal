@@ -1,10 +1,26 @@
 import '../css/app.css';
-import './bootstrap';
-import Main from './Main';
-import { createRoot } from 'react-dom/client';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
-const root = createRoot(el);
+import Login from './Pages/Login';
+import Products from './Pages/Products/Products';
+import RequireAuth from './Auth/RequireAuth.jsx';
 
-root.render(<Main {...props} />);
+ReactDOM.createRoot(document.getElementById('app')).render(
+    <BrowserRouter>
+        <Routes>
+            <Route path="/login" element={<Login />} />
+
+            <Route
+                path="/products"
+                element={
+                    <RequireAuth>
+                        <Products />
+                    </RequireAuth>
+                }
+            />
+        </Routes>
+    </BrowserRouter>
+);
