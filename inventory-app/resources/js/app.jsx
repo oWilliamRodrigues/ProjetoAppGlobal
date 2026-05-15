@@ -1,25 +1,41 @@
 import '../css/app.css';
 import './bootstrap';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
-import { createInertiaApp } from '@inertiajs/react';
-import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
-import { createRoot } from 'react-dom/client';
+import Login from './Login';
+import Products from './Pages/Products/Products';
+import RequireAuth from './RequireAuth';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+ReactDOM.createRoot(document.getElementById('app')).render(
+    <BrowserRouter>
+        <Routes>
+            <Route 
+                path="/" 
+                element={
+                    <Navigate to="/login" replace />
+                } 
+            />
 
-createInertiaApp({
-    title: (title) => `${title} - ${appName}`,
-    resolve: (name) =>
-        resolvePageComponent(
-            `./Pages/${name}.jsx`,
-            import.meta.glob('./Pages/**/*.jsx'),
-        ),
-    setup({ el, App, props }) {
-        const root = createRoot(el);
+            <Route 
+                path="/login" 
+                element={
+                    <Login />
+                } 
+            />
 
-        root.render(<App {...props} />);
-    },
-    progress: {
-        color: '#4B5563',
-    },
-});
+            <Route
+                path="/products"
+                element={
+                    <RequireAuth>
+                        <Products />
+                    </RequireAuth>
+                }
+            />
+            <Route 
+                path="*" 
+                element={<Navigate to="/" replace />} 
+            />
+        </Routes>
+    </BrowserRouter>
+);
