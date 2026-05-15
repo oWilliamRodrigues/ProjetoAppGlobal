@@ -5,6 +5,8 @@ import axios from 'axios';
 export default function Products() {
     const [products, setProducts] = useState([]);
     const [page, setPage] = useState(1);
+    const [lastPage, setLastPage] = useState(1);
+    const [total, setTotal] = useState(0);
     const [loading, setLoading] = useState(false);
     const [stockEdit, setStockEdit] = useState({});
 
@@ -21,6 +23,8 @@ export default function Products() {
             const response = await axios.get(`/products?page=${currentpage}`);
             setProducts(response.data.data);
             setPage(currentpage);
+            setLastPage(response.data.last_page);
+            setTotal(response.data.total);
         } catch (error) {
             console.error('Erro ao carregar produtos:', error);
         } 
@@ -138,8 +142,9 @@ export default function Products() {
                     </button>
                     <span className="text-sm text-gray-600">Página <strong className="font-display text-navy">{page}</strong></span>
                     <button
+                        disabled={page >= lastPage}
                         onClick={() => fetchProducts(page + 1)}
-                        className="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition"
+                        className="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition"
                     >
                         Próxima
                     </button>

@@ -43,6 +43,12 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 COPY --chown=www-data:www-data . /var/www
 
 # Expose port
+COPY --chown=dev:dev docker/php/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Expose port
 EXPOSE 9000
 
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["php-fpm"]
+
