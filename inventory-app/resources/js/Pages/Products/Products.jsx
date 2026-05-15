@@ -1,18 +1,24 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 export default function Products() {
     const [products, setProducts] = useState([]);
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
-
     const [stockEdit, setStockEdit] = useState({});
 
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        localStorage.clear();
+        navigate('/login', { replace: true });
+    }
     async function fetchProducts(currentpage = 1) {
         setLoading(true);
 
         try {
-            const response = await axios.get(`/api/products?page=${currentpage}`);
+            const response = await axios.get(`/products?page=${currentpage}`);
             setProducts(response.data.data);
             setPage(currentpage);
         } catch (error) {
@@ -34,7 +40,7 @@ export default function Products() {
     }
     async function saveStock(productId) {
         try {
-            await axios.patch(`/api/products/${productId}/stock`, {
+            await axios.patch(`/products/${productId}/stock`, {
                 operation: 'set',
                 quantity: Number(stockEdit[productId] || 0),
             });
@@ -49,7 +55,7 @@ export default function Products() {
 
     async function syncProducts(){
         try {
-            await axios.post("/api/products/sync");
+            await axios.post("/products/sync");
             alert("Sincronizado!");
 
             fetchProducts(page);
@@ -61,6 +67,10 @@ export default function Products() {
     return (
         <div style={{ padding: 20 }}>
             <h1>Products</h1>
+
+            <button onClick={handleLogout}>
+                Sair
+            </button>
 
             <button onClick={syncProducts}>
                 Sincronizar com Fake Store API
@@ -93,7 +103,7 @@ export default function Products() {
                                     type="number"
                                     value={stockEdit[p.id] ?? p.stock_quantity}
                                     onChange={(e) =>
-                                        handleStockChange(p.id, e.target.value)
+                                        updateStock(p.id, e.target.value)
                                     }
                                 />
                             </td>
@@ -111,14 +121,14 @@ export default function Products() {
             <div style={{ marginTop: 20 }}>
                 <button
                     disabled={page <= 1}
-                    onClick={() => loadProducts(page - 1)}
+                    onClick={() => fetchProducts(page - 1)}
                 >
                     Anterior
                 </button>
 
                 <span style={{ margin: "0 10px" }}>Página {page}</span>
 
-                <button onClick={() => loadProducts(page + 1)}>
+                <button onClick={() => fetchProducts(page + 1)}>
                     Próxima
                 </button>
             </div>

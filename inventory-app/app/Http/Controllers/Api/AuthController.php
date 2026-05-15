@@ -12,8 +12,13 @@ class AuthController extends Controller
 {
     public function login(LoginRequest $request): JsonResponse
     {
-        $token = Auth::attempt(['email' => $request->email, 'password' => $request->password]);
-        $user = Auth::user();
+        $token = auth('api')->attempt(['email' => $request->email, 'password' => $request->password]);
+        
+        if (!$token) {
+            return response()->json(['message' => 'Credenciais inválidas'], 401);
+        }
+
+        $user = auth('api')->user();
 
         return response()->json([
             'user' => $user->only(['id', 'name', 'email']),
@@ -23,7 +28,7 @@ class AuthController extends Controller
 
     public function logout(Request $request): JsonResponse
     {
-        Auth::logout();
+        auth('api')->logout();
 
         return response()->json(['message' => 'Deslogado com sucesso']);
     }

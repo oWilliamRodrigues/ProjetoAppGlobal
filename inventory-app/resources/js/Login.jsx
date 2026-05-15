@@ -1,27 +1,26 @@
 import { useState } from 'react';
-import { apiFetch } from './api';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
-export default function Login({ onLogin }) {
+export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
         setLoading(true);
         try {
-            const data = await apiFetch('/login', {
-                method: 'POST',
-                // headers: {
-                //     'Content-Type': 'application/json'
-                // },
-                body: JSON.stringify({ email, password })
-            });
-            onLogin(data.token, data.user);
+            const { data } = await axios.post('/login', { email, password });
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('user', JSON.stringify(data.user));
+            navigate('/products', { replace: true });
         } catch (err) {
-            setError('Invalid email or password');
+            setError(err.response?.data?.message || 'Erro ao fazer login');
         } finally {
             setLoading(false);
         }
