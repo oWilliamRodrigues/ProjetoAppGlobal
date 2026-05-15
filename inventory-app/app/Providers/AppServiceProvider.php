@@ -5,6 +5,9 @@ namespace App\Providers;
 use App\Services\Api;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Foundation\Application;
+
+
 
 class AppServiceProvider extends ServiceProvider
 {

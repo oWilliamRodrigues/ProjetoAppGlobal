@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Products\UpdateStockRequest;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -16,6 +15,7 @@ class ProductController extends Controller
     public function __construct(private readonly ProductSyncService $sync)
     {
     }
+    
     public function index(Request $request): JsonResponse
     {
         $this->authorize('viewAny', Product::class);
@@ -23,18 +23,28 @@ class ProductController extends Controller
         $default = (int) config('api.pagination.default_per_page');
 
         $perPage = (int) $request->integer('per_page', $default);
+        $search = $request->query('search');
 
         $products = Product::query()
             ->orderBy('title')
-            ->paginate($perPage);
+            ->when($search, function ($query) use ($search) {
+                $query->where('title', 'like', "%{$search}%");
+            })
+            ->paginate($perPage)
+            ->appends($request->only('search', 'per_page'));
 
         return response()->json($products);
     }
 
-    public function updateStock(UpdateStockRequest $request, Product $product): JsonResponse
+    public function updateStock(Request $request, Product $product): JsonResponse
     {
-        $op = $request->validated('operation');
-        $qty = (int) $request->validated('quantity');
+        $validated = $request->validate([
+            'operation' => 'required|in:set,increment,decrement',
+            'quantity' => 'required|integer|min:1',
+        ]);
+
+        $op = $validated['operation'];
+        $qty = (int) $validated['quantity'];
 
         $updated = DB::transaction(function () use ($product, $op, $qty) {
             $fresh = Product::lockForUpdate()->findOrFail($product->id);
@@ -62,7 +72,6 @@ class ProductController extends Controller
 
     public function syncFromApi(): JsonResponse
     {
-        dd("coiso");
         try {
             $stats = $this->sync->sync();
 

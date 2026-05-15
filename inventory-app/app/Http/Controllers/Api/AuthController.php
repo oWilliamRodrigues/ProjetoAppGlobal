@@ -6,14 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
     public function login(LoginRequest $request): JsonResponse
     {
-        $user = $request->authenticate();
-
-        $token = $user->createToken('api-token')->plainTextToken;
+        $token = Auth::attempt(['email' => $request->email, 'password' => $request->password]);
+        $user = Auth::user();
 
         return response()->json([
             'user' => $user->only(['id', 'name', 'email']),
@@ -25,7 +25,7 @@ class AuthController extends Controller
     {
         $request->user()->currentAccessToken()->delete();
 
-        return response()->json(['message' => 'Logged out']);
+        return response()->json(['message' => 'Deslogado com sucesso']);
     }
 
     public function me(Request $request): JsonResponse

@@ -32,9 +32,9 @@ class ProductSyncService
                         'external_id' => $product['id'],
                         'title' => $product['title'],
                         'price' => $product['price'],
-                        'description' => $product['description'],
-                        'category' => $product['category'],
-                        'image' => $product['image'],
+                        'description' => $product['description'] ?? null,
+                        'category' => $product['category'] ?? null,
+                        'image' => $product['image'] ?? null,
                         'rating_rate' => $product['rating']['rate'] ?? null,
                         'rating_count' => $product['rating']['count'] ?? null,
                     ]

@@ -15,12 +15,21 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [
-            HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
         ]);
 
         $middleware->statefulApi();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (
+        \Illuminate\Auth\AuthenticationException $e,
+        $request
+        ) {
+            if ($request->is('api/*')) {
+                return response()->json([
+                    'message' => 'Não autenticado'
+                ], 401);
+            }
+
+        });
     })->create();

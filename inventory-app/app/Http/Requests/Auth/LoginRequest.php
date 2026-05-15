@@ -41,10 +41,11 @@ class LoginRequest extends FormRequest
      */
     public function authenticate(): User
     {
+        dd(123);
         $this->ensureIsNotRateLimited();
 
         $user = User::where('email', $this->email)->first();
-
+        
         if (! $user || ! Hash::check($this->password, $user->password)) {
             RateLimiter::hit($this->throttleKey());
             throw ValidationException::withMessages(['email' => trans('auth.failed')]);
