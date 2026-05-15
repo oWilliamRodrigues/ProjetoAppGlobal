@@ -12,14 +12,8 @@ class AuthController extends Controller
 {
     public function login(LoginRequest $request): JsonResponse
     {
-        if(Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-            $user = Auth::user();
-        } 
-        else {
-            return response()->json(['message' => 'Credenciais inválidas'], 401);
-        }
-
-        $token = $user->createToken('api-token')->plainTextToken;
+        $token = Auth::attempt(['email' => $request->email, 'password' => $request->password]);
+        $user = Auth::user();
 
         return response()->json([
             'user' => $user->only(['id', 'name', 'email']),
@@ -29,7 +23,7 @@ class AuthController extends Controller
 
     public function logout(Request $request): JsonResponse
     {
-        $request->user()->currentAccessToken()->delete();
+        Auth::logout();
 
         return response()->json(['message' => 'Deslogado com sucesso']);
     }

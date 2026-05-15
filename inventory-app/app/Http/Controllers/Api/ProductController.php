@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use App\Services\ProductSyncService;
+use App\Http\Requests\Products\UpdateStockRequest;
 
 class ProductController extends Controller
 {
@@ -21,7 +22,6 @@ class ProductController extends Controller
         $this->authorize('viewAny', Product::class);
 
         $default = (int) config('api.pagination.default_per_page');
-
         $perPage = (int) $request->integer('per_page', $default);
         $search = $request->query('search');
 
@@ -32,27 +32,29 @@ class ProductController extends Controller
             })
             ->paginate($perPage)
             ->appends($request->only('search', 'per_page'));
-
+        
         return response()->json($products);
+
     }
 
-    public function updateStock(Request $request, Product $product): JsonResponse
+    public function updateStock(UpdateStockRequest $request, Product $product): JsonResponse
     {
-        $op = $request->validate('operation');
-        $qty = (int) $request->validate('quantity');
+        $validated = $request->validated();
+        $operation = $validated['operation'];
+        $quantity = (int) $validated['quantity'];
 
-        $updated = DB::transaction(function () use ($product, $op, $qty) {
+        $updated = DB::transaction(function () use ($product, $operation, $quantity) {
             $fresh = Product::lockForUpdate()->findOrFail($product->id);
 
-            $newQty = match ($op) {
-                'set' => $qty,
-                'increment' => $fresh->stock_quantity + $qty,
-                'decrement' => $fresh->stock_quantity - $qty,
+            $newQty = match ($operation) {
+                'set' => $quantity,
+                'increment' => $fresh->stock_quantity + $quantity,
+                'decrement' => $fresh->stock_quantity - $quantity,
             };
 
             if ($newQty < 0) {
                 throw ValidationException::withMessages([
-                    'quantity' => "Estoque insuficiente: atual {$fresh->stock_quantity}, tentativa de remover {$qty}.",
+                    'quantity' => "Estoque insuficiente: atual {$fresh->stock_quantity}, tentativa de remover {$quantity}.",
                 ]);
             }
 
