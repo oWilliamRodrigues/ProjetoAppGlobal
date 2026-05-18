@@ -22,7 +22,7 @@ class Order extends Model{
         return [
             "user_email" => "string",
             'amount' => 'decimal:2',
-            'status' => Status::class
+            'status' => Status::class,
         ];
     }
 
