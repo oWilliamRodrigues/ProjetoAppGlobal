@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './Login';
 import UserProducts from './Pages/Products/UserProducts';
 import AdminProducts from './Pages/Products/AdminProducts';
+import AdminValidations from './Pages/Products/AdminValidations';
 import RequireAuth from './RequireAuth';
 import { ShopcartProvider } from './Pages/Shopcart/ShopcartContext';
 import { Shopcart } from './Pages/Shopcart/Shopcart';
@@ -21,21 +22,37 @@ ReactDOM.createRoot(document.getElementById('app')).render(
                         <Navigate to="/login" replace />
                     } 
                 />
+
                 <Route 
                     path="/login" 
                     element={
                         <Login />
                     } 
                 />
+
                 <Route
                     path="/products"
                     element={
-                        <RequireAuth>
-                            <Products />
-                        </RequireAuth>
+                        <UserProducts />                    
                     }
                 />
                 <Route
+                   path="/admin"
+                   element={
+                       <RequireAuth>
+                           <AdminProducts />
+                       </RequireAuth>
+                   }
+                />
+                <Route
+                   path="/validation"
+                   element={
+                       <RequireAuth>
+                           <AdminValidations />
+                       </RequireAuth>
+                   }
+                />
+                 <Route
                     path="/shopcart"
                     element={
                         <RequireAuth>

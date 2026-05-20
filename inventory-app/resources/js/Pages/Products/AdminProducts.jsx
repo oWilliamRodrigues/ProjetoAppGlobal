@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 
 export default function AdminProducts() {
@@ -76,6 +76,14 @@ export default function AdminProducts() {
                     <div>
                         <h1 className="font-sans text-xl font-semibold">Gerente de Estoque</h1>
                         <p className="text-xs text-cyan/80">Por Adam e William</p>
+                    </div>
+                    <div className="flex gap-4">
+                        <Link to="/admin" className="text-white/80 hover:text-white border border-white/30 hover:border-white px-3 py-1.5 rounded-lg transition text-sm">
+                            Estoque
+                        </Link>
+                        <Link to="/validation" className="text-white/80 hover:text-white border border-white/30 hover:border-white px-3 py-1.5 rounded-lg transition text-sm">
+                            Validação
+                        </Link>
                     </div>
                     <button
                         onClick={handleLogout}
