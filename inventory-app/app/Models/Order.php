@@ -11,7 +11,6 @@ class Order extends Model{
     use HasFactory;
 
     protected $fillable = [
-        "order_id",
         "user_email",
         "status",
         "amount",
@@ -20,7 +19,7 @@ class Order extends Model{
     protected function casts(): array
     {
         return [
-            "user_email" => "string",
+            'items' => 'array',
             'amount' => 'decimal:2',
             'status' => Status::class,
         ];
