@@ -15,4 +15,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/products/sync', [ProductController::class, 'syncFromApi'])->name('api.products.sync');
     Route::patch('/products/{product}/stock', [ProductController::class, 'updateStock'])
         ->name('api.products.update-stock');
+    Route::get('/orders', [ProductController::class, 'indexOrders'])->name('api.orders.index');
+    Route::post('/orders/{order}/approve', [ProductController::class, 'approveOrder'])->name('api.orders.approve');
+    Route::post('/orders/{order}/discard', [ProductController::class, 'discardOrder'])->name('api.orders.discard');
 });

@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use App\Services\ProductSyncService;
 use App\Http\Requests\Products\UpdateStockRequest;
+// use App\Models\Order; IMPORTAR O MODELO DE PEDIDO
+// use App\Enums\OrderStatus; IMPORTAR O ENUM DE STATUS DO PEDIDO
 
 class ProductController extends Controller
 {
@@ -80,4 +82,43 @@ class ProductController extends Controller
             return response()->json(['message' => $e->getMessage()], 502);
         }
     }
+
+    // public function indexOrders() : JsonResponse
+    // {
+    //     $this->authorize('viewAny', Order::class);
+
+    //     $orders = Order::where('status', OrderStatus::Aguardando->value)
+    //         ->with('items.product')
+    //         ->get();
+
+    //     return response()->json($orders);
+    // }
+
+    // public function approveOrder(Order $order): JsonResponse
+    // {
+    //     $this->authorize('viewAny', Order::class);
+    //
+    //     DB::transaction(function () use ($order) {
+    //         foreach ($order->items as $item) {
+    //             $product = Product::lockForUpdate()->find($item->product_id);
+    //             if ($product->stock_quantity < $item->quantity) {
+    //                 abort(422, 'Estoque insuficiente');
+    //             }
+    //             $product->decrement('stock_quantity', $item->quantity);
+    //         }
+    //         $order->update(['status' => OrderStatus::Aprovado->value]);
+    //     });
+    //
+    //     return response() -> json(['message' => 'Pedido aprovado com sucesso.']);
+    // }
+
+    // public function discardOrder(Order $order): JsonResponse
+    // {
+    //     $this->authorize('viewAny', Order::class);
+    //     DB::transaction(function () use ($order) {
+    //         $order->update(['status' => OrderStatus::Descartado->value]);
+    //     });
+    //
+    //     return response() ->json(['message' => 'Pedido descartado com sucesso.']);
+    // }
 }
