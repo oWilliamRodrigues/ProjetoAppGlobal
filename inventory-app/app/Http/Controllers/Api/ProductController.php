@@ -8,15 +8,18 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use App\Services\OrderApprovalService;
 use App\Services\ProductSyncService;
 use App\Http\Requests\Products\UpdateStockRequest;
-use App\Models\Order; 
+use App\Models\Order;
 use App\Models\Enums\Status;
 
 class ProductController extends Controller
 {
-    public function __construct(private readonly ProductSyncService $sync)
-    {
+    public function __construct(
+        private readonly ProductSyncService $sync,
+        private readonly OrderApprovalService $orderApproval,
+    ) {
     }
     
     public function index(Request $request): JsonResponse
@@ -96,29 +99,19 @@ class ProductController extends Controller
 
     public function approveOrder(Order $order): JsonResponse
     {
-        $this->authorize('viewAny', Order::class);
-    
-        DB::transaction(function () use ($order) {
-            foreach ($order->items as $item) {
-                $product = Product::lockForUpdate()->find($item->product_id);
-                if ($product->stock_quantity < $item->quantity) {
-                    abort(422, 'Estoque insuficiente');
-                }
-                $product->decrement('stock_quantity', $item->quantity);
-            }
-            $order->update(['status' => Status::APROVADO->value]);
-        });
-    
-        return response() -> json(['message' => 'Pedido aprovado com sucesso.']);
+        $this->authorize('approve', $order);
+
+        $this->orderApproval->approve($order);
+
+        return response()->json(['message' => 'Pedido aprovado com sucesso.']);
     }
 
     public function discardOrder(Order $order): JsonResponse
     {
-        $this->authorize('viewAny', Order::class);
-        DB::transaction(function () use ($order) {
-            $order->update(['status' => Status::DESCARTADO->value]);
-        });
-    
-        return response() ->json(['message' => 'Pedido descartado com sucesso.']);
+        $this->authorize('discard', $order);
+
+        $this->orderApproval->discard($order);
+
+        return response()->json(['message' => 'Pedido descartado com sucesso.']);
     }
 }
