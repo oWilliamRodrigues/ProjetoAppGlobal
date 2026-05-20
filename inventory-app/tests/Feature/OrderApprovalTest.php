@@ -2,39 +2,31 @@
 
 namespace Tests\Feature;
 
-use App\Enums\OrderStatus;
+use App\Models\Enums\Status;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
-/**
- * Testes funcionais para aprovação e descarte de pedidos pela tela do admin.
- *
- * Todos os testes deste arquivo estão skipped até o merge do model Order
- * e do enum OrderStatus (PR da dupla). Para reativar, basta remover as
- * chamadas a $this->markTestSkipped() em cada método.
- */
 class OrderApprovalTest extends TestCase
 {
     use RefreshDatabase;
 
     private function authHeaderFor(User $user): array
     {
-        $token = $user->createToken('test-token')->plainTextToken;
+        $token = JWTAuth::fromUser($user);
 
         return ['Authorization' => 'Bearer ' . $token];
     }
 
     public function test_aprovar_pedido_com_estoque_suficiente_desconta_estoque_e_atualiza_status(): void
     {
-        $this->markTestSkipped('Aguardando merge do model Order/OrderStatus.');
-
-        $admin = User::factory()->create();
+        $admin = User::factory()->create(['role' => 'admin']);
         $product = Product::factory()->create(['stock_quantity' => 10]);
-        $order = Order::factory()->create(['status' => OrderStatus::Aguardando]);
+        $order = Order::factory()->create(['status' => Status::AGUARDANDO]);
         OrderItem::factory()->create([
             'order_id' => $order->id,
             'product_id' => $product->id,
@@ -47,16 +39,14 @@ class OrderApprovalTest extends TestCase
 
         $response->assertOk();
         $this->assertSame(7, $product->fresh()->stock_quantity);
-        $this->assertSame(OrderStatus::Aprovado->value, $order->fresh()->status);
+        $this->assertSame(Status::APROVADO, $order->fresh()->status);
     }
 
     public function test_aprovar_falha_com_422_quando_estoque_insuficiente_e_nao_altera_nada(): void
     {
-        $this->markTestSkipped('Aguardando merge do model Order/OrderStatus.');
-
-        $admin = User::factory()->create();
+        $admin = User::factory()->create(['role' => 'admin']);
         $product = Product::factory()->create(['stock_quantity' => 1]);
-        $order = Order::factory()->create(['status' => OrderStatus::Aguardando]);
+        $order = Order::factory()->create(['status' => Status::AGUARDANDO]);
         OrderItem::factory()->create([
             'order_id' => $order->id,
             'product_id' => $product->id,
@@ -69,16 +59,14 @@ class OrderApprovalTest extends TestCase
 
         $response->assertStatus(422);
         $this->assertSame(1, $product->fresh()->stock_quantity, 'Rollback: estoque não pode mudar.');
-        $this->assertSame(OrderStatus::Aguardando->value, $order->fresh()->status, 'Pedido deve continuar aguardando.');
+        $this->assertSame(Status::AGUARDANDO, $order->fresh()->status, 'Pedido deve continuar aguardando.');
     }
 
     public function test_descartar_pedido_muda_status_sem_alterar_estoque(): void
     {
-        $this->markTestSkipped('Aguardando merge do model Order/OrderStatus.');
-
-        $admin = User::factory()->create();
+        $admin = User::factory()->create(['role' => 'admin']);
         $product = Product::factory()->create(['stock_quantity' => 5]);
-        $order = Order::factory()->create(['status' => OrderStatus::Aguardando]);
+        $order = Order::factory()->create(['status' => Status::AGUARDANDO]);
         OrderItem::factory()->create([
             'order_id' => $order->id,
             'product_id' => $product->id,
@@ -91,7 +79,7 @@ class OrderApprovalTest extends TestCase
 
         $response->assertOk();
         $this->assertSame(5, $product->fresh()->stock_quantity, 'Descarte não toca no estoque.');
-        $this->assertSame(OrderStatus::Descartado->value, $order->fresh()->status);
+        $this->assertSame(Status::DESCARTADO, $order->fresh()->status);
     }
 
     /**
@@ -111,19 +99,17 @@ class OrderApprovalTest extends TestCase
      */
     public function test_duas_aprovacoes_do_mesmo_produto_nao_deixam_estoque_negativo(): void
     {
-        $this->markTestSkipped('Aguardando merge do model Order/OrderStatus.');
-
-        $admin = User::factory()->create();
+        $admin = User::factory()->create(['role' => 'admin']);
         $product = Product::factory()->create(['stock_quantity' => 2]);
 
-        $order1 = Order::factory()->create(['status' => OrderStatus::Aguardando]);
+        $order1 = Order::factory()->create(['status' => Status::AGUARDANDO]);
         OrderItem::factory()->create([
             'order_id' => $order1->id,
             'product_id' => $product->id,
             'quantity' => 2,
         ]);
 
-        $order2 = Order::factory()->create(['status' => OrderStatus::Aguardando]);
+        $order2 = Order::factory()->create(['status' => Status::AGUARDANDO]);
         OrderItem::factory()->create([
             'order_id' => $order2->id,
             'product_id' => $product->id,
@@ -142,7 +128,7 @@ class OrderApprovalTest extends TestCase
         $this->assertSame(0, $finalStock);
         $this->assertGreaterThanOrEqual(0, $finalStock, 'Estoque jamais pode ser negativo.');
 
-        $this->assertSame(OrderStatus::Aprovado->value, $order1->fresh()->status);
-        $this->assertSame(OrderStatus::Aguardando->value, $order2->fresh()->status);
+        $this->assertSame(Status::APROVADO, $order1->fresh()->status);
+        $this->assertSame(Status::AGUARDANDO, $order2->fresh()->status);
     }
 }

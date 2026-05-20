@@ -8,50 +8,62 @@ import UserProducts from './Pages/Products/UserProducts';
 import AdminProducts from './Pages/Products/AdminProducts';
 import AdminValidations from './Pages/Products/AdminValidations';
 import RequireAuth from './RequireAuth';
+import { ShopcartProvider } from './Pages/Shopcart/ShopcartContext';
+import { Shopcart } from './Pages/Shopcart/Shopcart';
 
 ReactDOM.createRoot(document.getElementById('app')).render(
-    <BrowserRouter>
-        <Routes>
-            <Route 
-                path="/" 
-                element={
-                    <Navigate to="/login" replace />
-                } 
-            />
+    <ShopcartProvider>
+        <BrowserRouter>
+            <Routes>
+                <Route 
+                    path="/" 
+                    element={
+                        <Navigate to="/login" replace />
+                    } 
+                />
 
-            <Route 
-                path="/login" 
-                element={
-                    <Login />
-                } 
-            />
+                <Route 
+                    path="/login" 
+                    element={
+                        <Login />
+                    } 
+                />
 
-            <Route
-                path="/products"
-                element={
-                    <UserProducts />                    
-                }
-            />
-            <Route
-               path="/admin"
-               element={
-                   <RequireAuth>
-                       <AdminProducts />
-                   </RequireAuth>
-               }
-            />
-            <Route
-               path="/validation"
-               element={
-                   <RequireAuth>
-                       <AdminValidations />
-                   </RequireAuth>
-               }
-            />
-            <Route 
-                path="*" 
-                element={<Navigate to="/" replace />} 
-            />
-        </Routes>
-    </BrowserRouter>
+                <Route
+                    path="/products"
+                    element={
+                        <UserProducts />                    
+                    }
+                />
+                <Route
+                   path="/admin"
+                   element={
+                       <RequireAuth>
+                           <AdminProducts />
+                       </RequireAuth>
+                   }
+                />
+                <Route
+                   path="/validation"
+                   element={
+                       <RequireAuth>
+                           <AdminValidations />
+                       </RequireAuth>
+                   }
+                />
+                 <Route
+                    path="/shopcart"
+                    element={
+                        <RequireAuth>
+                            <Shopcart />
+                        </RequireAuth>
+                    }
+                />
+                <Route 
+                    path="*" 
+                    element={<Navigate to="/" replace />} 
+                />
+            </Routes>
+        </BrowserRouter>
+    </ShopcartProvider>
 );
