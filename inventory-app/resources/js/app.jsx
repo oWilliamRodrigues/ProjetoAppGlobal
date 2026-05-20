@@ -4,7 +4,8 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 import Login from './Login';
-import Products from './Pages/Products/Products';
+import UserProducts from './Pages/Products/UserProducts';
+import AdminProducts from './Pages/Products/AdminProducts';
 import RequireAuth from './RequireAuth';
 
 ReactDOM.createRoot(document.getElementById('app')).render(
@@ -27,10 +28,16 @@ ReactDOM.createRoot(document.getElementById('app')).render(
             <Route
                 path="/products"
                 element={
-                    <RequireAuth>
-                        <Products />
-                    </RequireAuth>
+                    <UserProducts />                    
                 }
+            />
+            <Route
+               path="/admin"
+               element={
+                   <RequireAuth>
+                       <AdminProducts />
+                   </RequireAuth>
+               }
             />
             <Route 
                 path="*" 

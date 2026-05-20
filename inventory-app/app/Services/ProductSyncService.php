@@ -31,7 +31,7 @@ class ProductSyncService
                         'price' => $product['price'],
                         'description' => $product['description'] ?? null,
                         'category' => $product['category'] ?? null,
-                        'image' => $product['image'] ?? null,
+                        'image_url' => $product['image'] ?? null,
                         'rating_rate' => $product['rating']['rate'] ?? null,
                         'rating_count' => $product['rating']['count'] ?? null,
                     ]
