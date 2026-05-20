@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\OrderController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/login', [AuthController::class, 'login'])
@@ -16,5 +17,5 @@ Route::middleware('auth:api')->group(function () {
     Route::patch('/products/{product}/stock', [ProductController::class, 'updateStock'])
         ->name('api.products.update-stock');
     Route::get('/shopcart', [ProductController::class, 'getShopcart'])->name('api.shopcart');
-    
+    Route::post('/checkout', [OrderController::class, 'checkout'])->name('api.checkout');
 });
