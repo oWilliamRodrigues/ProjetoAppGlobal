@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-export default function Products() {
+export default function AdminProducts() {
     const [products, setProducts] = useState([]);
     const [page, setPage] = useState(1);
     const [lastPage, setLastPage] = useState(1);
