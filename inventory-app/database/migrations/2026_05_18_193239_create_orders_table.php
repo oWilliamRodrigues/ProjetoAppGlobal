@@ -11,8 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('item_pedidos', function (Blueprint $table) {
+        Schema::create('orders', function (Blueprint $table) {
             $table->id();
+            $table->string('user_email');
+            $table->decimal('amount', 10, 2);
+            $table->enum('status', ['AGUARDANDO', 'APROVADO', 'DESCARTADO'])->default('AGUARDANDO');
             $table->timestamps();
         });
     }
@@ -22,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('item_pedidos');
+        Schema::dropIfExists('orders');
     }
 };

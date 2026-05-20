@@ -15,7 +15,7 @@ return new class extends Migration
             $table->decimal('price', 8, 2);
             $table->text('description')->nullable();
             $table->string('category')->nullable();
-            $table->string('image_url')->nullable();
+            $table->string('image')->nullable();
             $table->decimal('rating_rate', 2, 1)->nullable();
             $table->unsignedInteger('rating_count')->nullable();
             $table->unsignedInteger('stock_quantity')->default(0);
