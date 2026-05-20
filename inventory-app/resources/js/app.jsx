@@ -4,7 +4,8 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 import Login from './Login';
-import Products from './Pages/Products/Products';
+import UserProducts from './Pages/Products/UserProducts';
+import AdminProducts from './Pages/Products/AdminProducts';
 import RequireAuth from './RequireAuth';
 import { ShopcartProvider } from './Pages/Shopcart/ShopcartContext';
 import { Shopcart } from './Pages/Shopcart/Shopcart';
