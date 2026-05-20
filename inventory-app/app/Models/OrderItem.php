@@ -1,6 +1,6 @@
 <?php
 
-class ItemPedido extends Model {
+class OrderItem extends Model {
     protected $fillable = [
         'id',
         'pedido_id',
