@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('user_email');
             $table->decimal('amount', 10, 2);
-            $table->enum('status', ['AGUARDANDO', 'APROVADO', 'DESCARTADO'])->default('AGUARDANDO');
+            $table->enum('status', ['aguardando', 'aprovado', 'descartado'])->default('aguardando');
             $table->timestamps();
         });
     }

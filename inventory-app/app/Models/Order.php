@@ -19,7 +19,6 @@ class Order extends Model{
     protected function casts(): array
     {
         return [
-            'items' => 'array',
             'amount' => 'decimal:2',
             'status' => Status::class,
         ];
@@ -28,4 +27,9 @@ class Order extends Model{
     protected $attributes = [
         'status' => Status::AGUARDANDO,
     ];
+
+    public function items()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
 }

@@ -8,13 +8,18 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use App\Services\OrderApprovalService;
 use App\Services\ProductSyncService;
 use App\Http\Requests\Products\UpdateStockRequest;
+use App\Models\Order;
+use App\Models\Enums\Status;
 
 class ProductController extends Controller
 {
-    public function __construct(private readonly ProductSyncService $sync)
-    {
+    public function __construct(
+        private readonly ProductSyncService $sync,
+        private readonly OrderApprovalService $orderApproval,
+    ) {
     }
     
     public function index(Request $request): JsonResponse
@@ -79,5 +84,34 @@ class ProductController extends Controller
         } catch (\RuntimeException $e) {
             return response()->json(['message' => $e->getMessage()], 502);
         }
+    }
+
+    public function indexOrders() : JsonResponse
+    {
+        $this->authorize('viewAny', Order::class);
+
+        $orders = Order::where('status', Status::AGUARDANDO->value)
+            ->with('items.product')
+            ->get();
+
+        return response()->json($orders);
+    }
+
+    public function approveOrder(Order $order): JsonResponse
+    {
+        $this->authorize('approve', $order);
+
+        $this->orderApproval->approve($order);
+
+        return response()->json(['message' => 'Pedido aprovado com sucesso.']);
+    }
+
+    public function discardOrder(Order $order): JsonResponse
+    {
+        $this->authorize('discard', $order);
+
+        $this->orderApproval->discard($order);
+
+        return response()->json(['message' => 'Pedido descartado com sucesso.']);
     }
 }
