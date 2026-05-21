@@ -69,6 +69,15 @@ export default function Login() {
                     >
                         {loading ? 'Acessando...' : 'Entrar'}
                     </button>
+
+                    <button 
+                        type="button"
+                        onClick={() => {
+                            localStorage.clear();
+                            navigate('/products');
+                        }} className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2.5 rounded-lg transition">
+                        Entrar como Visitante
+                    </button>
                 </form>
             </div>
         </div>

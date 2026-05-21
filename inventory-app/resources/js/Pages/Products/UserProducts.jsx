@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
+import { useShopcart } from '../Shopcart/ShopcartContext';
 
 export default function UserProducts() {
     const [products, setProducts] = useState([]);
     const [page, setPage] = useState(1);
     const [lastPage, setLastPage] = useState(1);
-    const [total, setTotal] = useState(0);
     const [loading, setLoading] = useState(false);
     const [quantities, setQuantities] = useState({});
-    const [cart, setCart] = useState([]);
+    const { addToShopcart, totalQuantity } = useShopcart();
 
     const navigate = useNavigate();
     
@@ -26,7 +26,6 @@ export default function UserProducts() {
             setProducts(response.data.data);
             setPage(currentpage);
             setLastPage(response.data.last_page);
-            setTotal(response.data.total);
         } catch (error) {
             console.error('Erro ao carregar produtos:', error);
         } 
@@ -45,19 +44,14 @@ export default function UserProducts() {
         }));
     }
 
-    async function addToCart(product) {
+    function addToCart(product) {
         const quantity = quantities[product.id] || 1;
-        
-        try{
-            await axios.post("/shopcart",{
-                product_id: product.id,
-                quantity,
-            });
-        }
-        catch(error){
-            console.error('Erro ao adicionar ao carrinho:', error);
-        }
-        
+        addToShopcart({
+            product_id: product.id,
+            name: product.title,
+            price: Number(product.price),
+            quantity,
+        });
     }
 
     return (
@@ -69,12 +63,28 @@ export default function UserProducts() {
                         <h1 className="font-sans text-xl font-semibold">Gerente de Estoque</h1>
                         <p className="text-xs text-cyan/80">Por Adam e William</p>
                     </div>
-                    <button
-                        onClick={handleLogout}
-                        className="text-sm text-white/80 hover:text-white border border-white/30 hover:border-white px-3 py-1.5 rounded-lg transition"
-                    >
-                        Sair
-                    </button>
+                    <div className="flex items-center gap-3">
+                        <Link
+                            to="/shopcart"
+                            className="relative flex items-center gap-2 text-sm bg-royal hover:bg-royal/90 text-white px-3 py-1.5 rounded-lg transition shadow-sm"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                            Carrinho
+                            {totalQuantity > 0 && (
+                                <span className="bg-cyan text-navy text-xs font-bold rounded-full px-1.5 py-0.5 min-w-[1.25rem] text-center">
+                                    {totalQuantity}
+                                </span>
+                            )}
+                        </Link>
+                        <button
+                            onClick={handleLogout}
+                            className="text-sm text-white/80 hover:text-white border border-white/30 hover:border-white px-3 py-1.5 rounded-lg transition"
+                        >
+                            Sair
+                        </button>
+                    </div>
                 </div>
             </header>
 
