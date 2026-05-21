@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\OrderController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/login', [AuthController::class, 'login'])
@@ -18,5 +19,7 @@ Route::middleware('auth:api')->group(function () {
         ->name('api.products.update-stock');
     Route::get('/orders', [ProductController::class, 'indexOrders'])->name('api.orders.index');
     Route::post('/orders/{order}/approve', [ProductController::class, 'approveOrder'])->name('api.orders.approve');
-    Route::post('/orders/{order}/discard', [ProductController::class, 'discardOrder'])->name('api.orders.discard');    
+    Route::post('/orders/{order}/discard', [ProductController::class, 'discardOrder'])->name('api.orders.discard');
+    Route::get('/shopcart', [ProductController::class, 'getShopcart'])->name('api.shopcart');
+    Route::post('/checkout', [OrderController::class, 'checkout'])->name('api.checkout');
 });
