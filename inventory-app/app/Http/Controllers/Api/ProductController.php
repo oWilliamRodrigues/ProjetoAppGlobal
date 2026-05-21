@@ -24,8 +24,6 @@ class ProductController extends Controller
     
     public function index(Request $request): JsonResponse
     {
-        $this->authorize('viewAny', Product::class);
-
         $default = (int) config('api.pagination.default_per_page');
         $perPage = (int) $request->integer('per_page', $default);
         $search = $request->query('search');
