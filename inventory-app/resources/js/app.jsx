@@ -10,6 +10,7 @@ import AdminValidations from './Pages/Products/AdminValidations';
 import RequireAuth from './RequireAuth';
 import { ShopcartProvider } from './Pages/Shopcart/ShopcartContext';
 import { Shopcart } from './Pages/Shopcart/Shopcart';
+import Checkout from './Pages/Checkout/Checkout';
 
 ReactDOM.createRoot(document.getElementById('app')).render(
     <ShopcartProvider>
@@ -57,6 +58,12 @@ ReactDOM.createRoot(document.getElementById('app')).render(
                         <RequireAuth>
                             <Shopcart />
                         </RequireAuth>
+                    }
+                />
+                <Route
+                    path="/checkout"
+                    element={
+                        <Checkout />
                     }
                 />
                 <Route 
