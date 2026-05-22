@@ -90,7 +90,8 @@ class ProductController extends Controller
 
         $orders = Order::where('status', Status::AGUARDANDO->value)
             ->with('items.product')
-            ->get();
+            ->orderByDesc('id')
+            ->paginate(15);
 
         return response()->json($orders);
     }

@@ -115,7 +115,7 @@ export default function AdminValidations() {
                                                 <p className="text-sm text-gray-500">x{item.quantity}</p>
                                             </div>
                                         ))}
-
+                                            <p className="text-sm text-gray-500 mt-1 truncate max-w-full">{o.user_email}</p>
                                         {o.items.length > 2 && (
                                             <button
                                                 onClick={() => toggleExpanded(o.id)}
@@ -147,6 +147,29 @@ export default function AdminValidations() {
                         })}
                     </div>
                 )}
+
+                <div>
+                    <h2 className="font-display text-xl text-navy">Pedidos Confirmados</h2>
+ 
+                    {orders.filter(o => o.status === 'approved').map(o => (
+                        <div key={o.id} className="bg-white rounded-xl shadow-sm flex divide-x divide-gray-200 mt-4">
+                            <div className="flex flex-col justify-center items-center px-6 py-4 w-40">
+                                <h3 className="font-display text-2xl text-navy">#{o.id}</h3>
+                            </div>
+ 
+                            <div className="flex-1 px-6 py-4">
+                                {o.items.map((item) => (
+                                    <div key={item.id} className="flex items-center gap-4">
+                                        <p>{item.product.title}</p>
+                                        <p className="text-sm text-gray-500">x{item.quantity}</p>
+                                    </div>
+                                ))}
+                                <p className="text-xs text-gray-500 mt-1 truncate max-w-full">{o.buyer_email}</p>
+                                <p className="font-display text-lg text-navy mt-3">Total: R$ {Number(o.amount).toFixed(2)}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
 
                 <div className="mt-8 flex justify-center items-center gap-3">
                     <button

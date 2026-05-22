@@ -19,8 +19,13 @@ class OrderController extends Controller
     public function checkout(StoreOrderRequest $request) : JsonResponse
     {
         $data = $request->validated();
-        $order = $this->checkoutService->checkout($data['items'], $data['user_email']);
 
-        return response()->json(['order' => $order], 201);
+        $result = $this->checkoutService->checkoutWithPayment($data['items'], $data['user_email']);
+
+        return response()->json([
+            'order' => $result['order'],
+            'preference_id' => $result['preference_id'],
+            'init_point' => $result['init_point'],
+        ], 201);
     }
 }

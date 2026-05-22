@@ -1,12 +1,16 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useShopcart } from './ShopcartContext';
+import { useNavigate } from 'react-router-dom';
 
 
 export function EmptyShopcart() {
+    const navigate = useNavigate();
+
     return (
         <div className="text-center py-10">
             <h2 className="text-2xl font-semibold mb-4">Seu carrinho está vazio</h2>
+            <button onClick={() => navigate('/products')}>Ir para Produtos</button>
         </div>
     );
 }
@@ -15,7 +19,8 @@ export function Shopcart() {
     const { items } = useShopcart();
 
     if (items.length === 0) {
-        return <EmptyShopcart />;
+        return <EmptyShopcart />
+        ;
     }
 
     return (

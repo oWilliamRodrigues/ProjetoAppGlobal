@@ -6,8 +6,9 @@ use App\Services\Api;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\Application;
-
-
+use App\Contracts\PaymentGatewayInterface;
+use App\Services\MercadoPagoService;
+use App\Services\MockPaymentGateway;
 
 class AppServiceProvider extends ServiceProvider
 {

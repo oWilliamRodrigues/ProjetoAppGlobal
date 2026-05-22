@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/{any}', function () {
-    return view('app');
-})->where('any', '^(?!api).*$');
+Route::get('/checkout/retorno/{status}', fn ($status) => view('app'))
+    ->name('checkout.return');
+
+Route::get('/{any}', fn () => view('app'))->where('any', '^(?!api).*$');
