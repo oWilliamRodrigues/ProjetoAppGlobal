@@ -3,12 +3,13 @@
 namespace App\Services;
 
 use App\Models\Order;
+use App\Services\Contracts\PaymentGatewayInterface;
 use MercadoPago\Client\Preference\PreferenceClient;
 use MercadoPago\Exceptions\MPApiException;
 use MercadoPago\MercadoPagoConfig;
 use Illuminate\Support\Facades\Log;
 
-class MercadoPagoService
+class MercadoPagoService implements PaymentGatewayInterface
 {
     public function __construct()
     {

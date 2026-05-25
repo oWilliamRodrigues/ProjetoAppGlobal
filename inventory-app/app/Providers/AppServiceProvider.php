@@ -6,9 +6,8 @@ use App\Services\Api;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\Application;
-use App\Contracts\PaymentGatewayInterface;
+use App\Services\Contracts\PaymentGatewayInterface;
 use App\Services\MercadoPagoService;
-use App\Services\MockPaymentGateway;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,6 +19,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(Api::class, function (Application $app) {
             return $app->makeWith(Api::class, ['baseUrl' => config("api.url")]);
         });
+
+        $this->app->bind(PaymentGatewayInterface::class, MercadoPagoService::class);
     }
 
     /**

@@ -88,12 +88,21 @@ class ProductController extends Controller
     {
         $this->authorize('viewAny', Order::class);
 
-        $orders = Order::where('status', Status::AGUARDANDO->value)
+        $pending = Order::where('status', Status::AGUARDANDO->value)
             ->with('items.product')
             ->orderByDesc('id')
             ->paginate(15);
 
-        return response()->json($orders);
+        $approved = Order::where('status', Status::APROVADO->value)
+            ->with('items.product')
+            ->orderByDesc('id')
+            ->limit(20)
+            ->get();
+
+        return response()->json([
+            'pending' => $pending,
+            'approved' => $approved
+        ]);
     }
 
     public function approveOrder(Order $order): JsonResponse

@@ -6,17 +6,18 @@ use App\Models\Order;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use App\Models\Product;
+use App\Services\Contracts\PaymentGatewayInterface;
 
 
 class OrderCheckoutService {
-    public function __construct(private readonly MercadoPagoService $mp)
+    public function __construct(private readonly PaymentGatewayInterface $gateway)
     {
     }
 
     public function checkoutWithPayment(array $items, string $userEmail): array{
         $order = $this->checkout($items, $userEmail);
 
-        $preference = $this->mp->createPreference($order);
+        $preference = $this->gateway->createPreference($order);
 
         $order->update(['mp_preference_id' => $preference['preference_id']]);
         return[

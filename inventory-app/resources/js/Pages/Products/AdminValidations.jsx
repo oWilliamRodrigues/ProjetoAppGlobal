@@ -8,6 +8,8 @@ export default function AdminValidations() {
     const [lastPage, setLastPage] = useState(1);
     const [loading, setLoading] = useState(false);
     const [expanded, setExpanded] = useState({});
+    const [approved, setApproved] = useState([]);
+
     const navigate = useNavigate();
 
     const handleLogout = () => {
@@ -20,9 +22,10 @@ export default function AdminValidations() {
 
         try {
             const response = await axios.get(`/orders?page=${currentpage}`);
-            setOrders(response.data.data);
+            setOrders(response.data.pending.data);
             setPage(currentpage);
             setLastPage(response.data.last_page);
+            setApproved(response.data.approved);
         } catch (error) {
             console.error('Erro ao carregar pedidos:', error);
         }
@@ -151,7 +154,7 @@ export default function AdminValidations() {
                 <div>
                     <h2 className="font-display text-xl text-navy">Pedidos Confirmados</h2>
  
-                    {orders.filter(o => o.status === 'approved').map(o => (
+                    {approved.map(o => (
                         <div key={o.id} className="bg-white rounded-xl shadow-sm flex divide-x divide-gray-200 mt-4">
                             <div className="flex flex-col justify-center items-center px-6 py-4 w-40">
                                 <h3 className="font-display text-2xl text-navy">#{o.id}</h3>
@@ -164,7 +167,7 @@ export default function AdminValidations() {
                                         <p className="text-sm text-gray-500">x{item.quantity}</p>
                                     </div>
                                 ))}
-                                <p className="text-xs text-gray-500 mt-1 truncate max-w-full">{o.buyer_email}</p>
+                                <p className="text-sm text-gray-500 mt-1 truncate max-w-full">{o.user_email}</p>
                                 <p className="font-display text-lg text-navy mt-3">Total: R$ {Number(o.amount).toFixed(2)}</p>
                             </div>
                         </div>
