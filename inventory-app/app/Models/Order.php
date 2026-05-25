@@ -29,7 +29,7 @@ class Order extends Model{
     }
 
     protected $attributes = [
-        'status' => Status::AGUARDANDO,
+        'status' => Status::AGUARDANDO_PAGAMENTO,
     ];
 
     public function items()

@@ -3,16 +3,17 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Services\OrderStatusTranslateService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Models\Order;
-use App\Models\Enums\Status;
 use App\Services\MercadoPagoService;
 use Illuminate\Support\Facades\Log;    
+use Illuminate\Support\Facades\DB;
 
 class MercadoPagoWebhookController extends Controller
 {
-    public function __construct(private readonly MercadoPagoService $mp) {}
+    public function __construct(private readonly MercadoPagoService $mp, private readonly OrderStatusTranslateService $transitions) {}
 
     public function handle(Request $request): Response
     {
@@ -27,24 +28,36 @@ class MercadoPagoWebhookController extends Controller
         if ($type !== 'payment' || ! $paymentId) {
             return response('Ignored', 200); // 200 evita reenvios
         }
-
-        $payment = $this->mp->getPayment((string) $paymentId);
-
-        $order = Order::find($payment['external_reference']);
-        if (! $order) {
-            return response('Order not found', 200);
+        
+        try {
+            $payment = $this->mp->getPayment((string) $paymentId);
+        } catch (\RuntimeException $e) {
+            Log::error('Webhook MP: erro ao buscar pagamento', ['payment_id' => $paymentId, 'error' => $e->getMessage()]);
+            return response('Error', 502);
         }
 
-        if (in_array($order->mp_payment_status, ['approved', 'rejected', 'cancelled'], true)) {
-            return response('Already processed', 200);
-        }
+        $found = DB::transaction(function () use ($payment) {
+            $order = Order::where('id', $payment['external_reference'])->lockForUpdate()->first();
 
-        $order->update([
-            'mp_payment_id'     => $payment['id'],
-            'mp_payment_status' => $payment['status'],
-        ]);
+            if (! $order) {
+                return false;
+            }
 
-        return response('OK', 200);
+            if ($order->mp_payment_id === $payment['id'] && $order->mp_payment_status === $payment['status']) {
+                return false; 
+            }
+
+            $order->mp_payment_id = $payment['id'];
+            $order->mp_payment_status = $payment['status'];
+
+            $this->transitions->apply($order, $payment['status']);
+            
+            $order->save();
+
+            return true;
+        });
+
+        return $found ? response('OK', 200) : response('Order not found', 200);
     }
 
     private function isSignatureValid(Request $request): bool

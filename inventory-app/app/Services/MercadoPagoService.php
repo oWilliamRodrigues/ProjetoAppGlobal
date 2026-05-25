@@ -25,6 +25,8 @@ class MercadoPagoService implements PaymentGatewayInterface
     {
         $order->loadMissing('items.product');
 
+        $webhookUrl = env('MERCADOPAGO_NOTIFICATION_URL', route('api.checkout.webhook'));
+
         $items = $order->items->map(fn ($item) => [
             'id'          => (string) $item->product_id,
             'title'       => $item->product->title,
@@ -44,7 +46,7 @@ class MercadoPagoService implements PaymentGatewayInterface
                     'pending' => route('checkout.return', ['status' => 'pending']),
                 ],
                 // 'auto_return'        => 'approved',
-                // 'notification_url'   => route('api.checkout.webhook'),
+                'notification_url' => $webhookUrl,
             ]);
 
             return [
