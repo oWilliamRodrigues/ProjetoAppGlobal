@@ -25,7 +25,7 @@ class OrderController extends Controller
         return response()->json([
             'order' => $result['order'],
             'preference_id' => $result['preference_id'],
-            'init_point' => $result['init_point'],
+            'sandbox_init_point' => $result['sandbox_init_point'],
         ], 201);
     }
 }

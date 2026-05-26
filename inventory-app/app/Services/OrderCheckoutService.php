@@ -23,7 +23,7 @@ class OrderCheckoutService {
         return[
             'order' => $order,
             'preference_id' => $preference['preference_id'],
-            'init_point' => $preference['init_point'],
+            'sandbox_init_point' => $preference['sandbox_init_point'],
         ];
     }
 

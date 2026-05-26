@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->string('mp_init_point', 500)->nullable()->after('mp_preference_id');
+            $table->string('mp_sandbox_init_point', 500)->nullable()->after('mp_preference_id');
         });
     }
 
@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->dropColumn('mp_init_point');
+            $table->dropColumn('mp_sandbox_init_point');
         });
     }
 };

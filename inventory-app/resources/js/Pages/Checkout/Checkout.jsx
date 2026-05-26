@@ -35,7 +35,7 @@ export default function Checkout() {
 
             const { data } = await axios.post('/checkout', payload);
             clearShopcartContext();
-            window.location.href = data.init_point;
+            window.location.href = data.sandbox_init_point;
         }
 
         catch (err){

@@ -51,7 +51,7 @@ class MercadoPagoService implements PaymentGatewayInterface
 
             return [
                 'preference_id' => $preference->id,
-                'init_point'    => $preference->init_point,
+                'sandbox_init_point'=> $preference->sandbox_init_point,
             ];
         } catch (MPApiException $e) {
             $apiResponse = $e->getApiResponse();

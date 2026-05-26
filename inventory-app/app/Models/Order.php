@@ -17,7 +17,7 @@ class Order extends Model{
         'mp_preference_id',
         'mp_payment_id',
         'mp_payment_status',
-        'mp_init_point',
+        'mp_sandbox_init_point',
     ];
 
     protected function casts(): array
