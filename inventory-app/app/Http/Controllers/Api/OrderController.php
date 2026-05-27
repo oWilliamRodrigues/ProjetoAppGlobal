@@ -28,4 +28,43 @@ class OrderController extends Controller
             'sandbox_init_point' => $result['sandbox_init_point'],
         ], 201);
     }
+
+        public function indexOrders() : JsonResponse
+    {
+        $this->authorize('viewAny', Order::class);
+
+        $pending = Order::where('status', Status::AGUARDANDO->value)
+            ->with('items.product')
+            ->orderByDesc('id')
+            ->paginate(15);
+
+        $approved = Order::where('status', Status::APROVADO->value)
+            ->with('items.product')
+            ->orderByDesc('id')
+            ->limit(20)
+            ->get();
+
+        return response()->json([
+            'pending' => $pending,
+            'approved' => $approved
+        ]);
+    }
+
+    public function approveOrder(Order $order): JsonResponse
+    {
+        $this->authorize('approve', $order);
+
+        $this->orderApproval->approve($order);
+
+        return response()->json(['message' => 'Pedido aprovado com sucesso.']);
+    }
+
+    public function discardOrder(Order $order): JsonResponse
+    {
+        $this->authorize('discard', $order);
+
+        $this->orderApproval->discard($order);
+
+        return response()->json(['message' => 'Pedido descartado com sucesso.']);
+    }
 }

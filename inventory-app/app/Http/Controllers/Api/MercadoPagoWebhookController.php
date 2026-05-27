@@ -3,17 +3,18 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Services\Contracts\PaymentGatewayInterface;
 use App\Services\OrderStatusTranslateService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use App\Models\Order;
-use App\Services\MercadoPagoService;
 use Illuminate\Support\Facades\Log;    
 use Illuminate\Support\Facades\DB;
 
 class MercadoPagoWebhookController extends Controller
 {
-    public function __construct(private readonly MercadoPagoService $mp, private readonly OrderStatusTranslateService $transitions) {}
+    public function __construct(private readonly PaymentGatewayInterface $mp, private readonly OrderStatusTranslateService $transitions) {}
 
     public function handle(Request $request): Response
     {
@@ -21,14 +22,14 @@ class MercadoPagoWebhookController extends Controller
         $paymentId = $request->input('data.id');
 
         if ($type !== 'payment' || ! $paymentId) {
-            return response('Ignored', 200); // 200 evita reenvios
+            return response('Ignored', SymfonyResponse::HTTP_OK); // 200 evita reenvios
         }
         
         try {
             $payment = $this->mp->getPayment((string) $paymentId);
         } catch (\RuntimeException $e) {
             Log::error('Webhook MP: erro ao buscar pagamento', ['payment_id' => $paymentId, 'error' => $e->getMessage()]);
-            return response('Error', 502);
+            return response('Error', SymfonyResponse::HTTP_BAD_GATEWAY);
         }
 
         $found = DB::transaction(function () use ($payment) {
@@ -52,6 +53,6 @@ class MercadoPagoWebhookController extends Controller
             return true;
         });
 
-        return $found ? response('OK', 200) : response('Order not found', 200);
+        return $found ? response('OK', SymfonyResponse::HTTP_OK) : response('Order not found', SymfonyResponse::HTTP_NOT_FOUND);
     }
 }
