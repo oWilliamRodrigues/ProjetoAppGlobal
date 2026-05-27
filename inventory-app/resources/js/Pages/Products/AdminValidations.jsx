@@ -21,15 +21,16 @@ export default function AdminValidations() {
         setLoading(true);
 
         try {
-            const response = await axios.get(`/orders?page=${currentpage}`);
-            setOrders(response.data.pending.data);
+            const pendingRes = await axios.get(`/orders?status=aguardando&page=${currentpage}`);
+            setOrders(pendingRes.data.data);
             setPage(currentpage);
-            setLastPage(response.data.last_page);
-            setApproved(response.data.approved);
+            setLastPage(pendingRes.data.last_page);
+
+            const approvedRes = await axios.get(`/orders?status=aprovado`);
+            setApproved(approvedRes.data.data);
         } catch (error) {
             console.error('Erro ao carregar pedidos:', error);
         }
-
         setLoading(false);
     }
 

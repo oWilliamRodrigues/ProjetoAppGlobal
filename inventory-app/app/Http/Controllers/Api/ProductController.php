@@ -8,17 +8,13 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
-use App\Services\OrderApprovalService;
 use App\Services\ProductSyncService;
 use App\Http\Requests\Products\UpdateStockRequest;
-use App\Models\Order;
-use App\Models\Enums\Status;
 
 class ProductController extends Controller
 {
     public function __construct(
         private readonly ProductSyncService $sync,
-        private readonly OrderApprovalService $orderApproval,
     ) {
     }
     

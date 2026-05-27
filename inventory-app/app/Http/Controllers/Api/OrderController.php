@@ -6,14 +6,21 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Orders\StoreOrderRequest;
 use App\Services\OrderCheckoutService;
 use Illuminate\Http\JsonResponse;
+use App\Models\Order;
+use App\Models\Enums\Status;
+use App\Services\OrderApprovalService;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class OrderController extends Controller
 {
     public readonly OrderCheckoutService $checkoutService;
+    private readonly OrderApprovalService $orderApproval;
 
-    public function __construct(OrderCheckoutService $checkoutService)
+    public function __construct(OrderCheckoutService $checkoutService, OrderApprovalService $orderApproval)
     {
         $this->checkoutService = $checkoutService;
+        $this->orderApproval = $orderApproval;
     }
 
     public function checkout(StoreOrderRequest $request) : JsonResponse
@@ -29,25 +36,17 @@ class OrderController extends Controller
         ], 201);
     }
 
-        public function indexOrders() : JsonResponse
+    public function indexOrders(Request $request) : JsonResponse
     {
         $this->authorize('viewAny', Order::class);
 
-        $pending = Order::where('status', Status::AGUARDANDO->value)
-            ->with('items.product')
-            ->orderByDesc('id')
-            ->paginate(15);
-
-        $approved = Order::where('status', Status::APROVADO->value)
-            ->with('items.product')
-            ->orderByDesc('id')
-            ->limit(20)
-            ->get();
-
-        return response()->json([
-            'pending' => $pending,
-            'approved' => $approved
+        $validated = $request->validate([
+            'status' => ['required', Rule::enum(Status::class)],
         ]);
+
+        $orders = Order::where('status', $validated['status'])->with('items.product')->orderByDesc('id')->paginate(15);
+
+        return response()->json($orders);
     }
 
     public function approveOrder(Order $order): JsonResponse

@@ -40,7 +40,7 @@ return [
     ],
 
     'mercado_pago' => [
-        'access_token' =>"APP_USR-4700503980993879-052609-e6921af1b3d5ff296c5fb00b54720cdb-3428536480",
+        'access_token' => env('MERCADO_PAGO_ACCESS_TOKEN'),
         'webhook_secret' => env('MERCADO_PAGO_WEBHOOK_SECRET'),
     ],
 
