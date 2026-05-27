@@ -25,7 +25,7 @@ class MercadoPagoService implements PaymentGatewayInterface
     {
         $order->loadMissing('items.product');
 
-        $webhookUrl = env('MERCADOPAGO_NOTIFICATION_URL', route('api.checkout.webhook'));
+        $webhookUrl = env('MERCADO_PAGO_NOTIFICATION_URL', route('api.checkout.webhook'));
 
         $items = $order->items->map(fn ($item) => [
             'id'          => (string) $item->product_id,
@@ -82,6 +82,40 @@ class MercadoPagoService implements PaymentGatewayInterface
             ];
         } catch (MPApiException $e) {
             throw new \RuntimeException('Erro ao consultar pagamento: ' . $e->getMessage(), previous: $e);
+        }
+    }
+
+    public function refund(string $paymentId): array
+    {
+        try {
+            $client = new \MercadoPago\Client\Payment\PaymentRefundClient();
+    
+            $options = new \MercadoPago\Client\Common\RequestOptions();
+            $options->setCustomHeaders([
+                "X-Idempotency-Key: " . \Illuminate\Support\Str::uuid()->toString(),
+            ]);
+    
+            $refund = $client->refundTotal((int) $paymentId, $options);
+    
+            return [
+                'id'     => $refund->id,
+                'status' => $refund->status,
+                'amount' => $refund->amount,
+            ];
+        } catch (MPApiException $e) {
+            $apiResponse = $e->getApiResponse();
+            Log::error('Erro ao processar reembolso', [
+                'payment_id' => $paymentId,
+                'status'     => $apiResponse?->getStatusCode(),
+                'content'    => $apiResponse?->getContent(),
+                'message'    => $e->getMessage(),
+            ]);
+    
+            throw new \RuntimeException(
+                'Erro ao processar reembolso: ' .
+                ($apiResponse?->getContent()['message'] ?? $e->getMessage()),
+                previous: $e
+            );
         }
     }
 }

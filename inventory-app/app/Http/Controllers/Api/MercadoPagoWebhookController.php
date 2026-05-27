@@ -28,7 +28,6 @@ class MercadoPagoWebhookController extends Controller
             $payment = $this->mp->getPayment((string) $paymentId);
         } catch (\RuntimeException $e) {
             Log::error('Webhook MP: erro ao buscar pagamento', ['payment_id' => $paymentId, 'error' => $e->getMessage()]);
-            dd($e);
             return response('Error', 502);
         }
 
