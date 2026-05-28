@@ -14,6 +14,10 @@ class Order extends Model{
         "user_email",
         "status",
         "amount",
+        'mp_preference_id',
+        'mp_payment_id',
+        'mp_payment_status',
+        'mp_sandbox_init_point',
     ];
 
     protected function casts(): array
@@ -25,7 +29,7 @@ class Order extends Model{
     }
 
     protected $attributes = [
-        'status' => Status::AGUARDANDO,
+        'status' => Status::AGUARDANDO_PAGAMENTO,
     ];
 
     public function items()

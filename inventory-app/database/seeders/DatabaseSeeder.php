@@ -17,8 +17,9 @@ class DatabaseSeeder extends Seeder
             ['email' => 'admin@globalsys.com.br'],
             [
                 'name' => 'Administrador',
-                'password' => Hash::make('ChangeMe!2026'),
+                'password' => Hash::make('admin!2026'),
                 'email_verified_at' => now(),
+                'role' => 'admin',
             ],
         );
 
@@ -26,8 +27,9 @@ class DatabaseSeeder extends Seeder
             ['email' => 'operator@globalsys.com.br'],
             [
                 'name' => 'Operador',
-                'password' => Hash::make('Operator!2026'),
+                'password' => Hash::make('operator!2026'),
                 'email_verified_at' => now(),
+                'role'=> 'operator',
             ],
         );
 

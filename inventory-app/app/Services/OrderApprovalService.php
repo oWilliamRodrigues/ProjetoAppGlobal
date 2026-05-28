@@ -5,10 +5,16 @@ namespace App\Services;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Enums\Status;
+use App\Services\Contracts\PaymentGatewayInterface;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class OrderApprovalService {
+
+    public function __construct(private PaymentGatewayInterface $gateway)
+    {
+    }
+
     public function approve(Order $order) : void 
     {
         DB::transaction(function () use ($order)
@@ -42,6 +48,9 @@ class OrderApprovalService {
     public function discard(Order $order) : void 
     {
         DB::transaction(function () use ($order) {
+            if($order->mp_payment_id && $order->mp_payment_status === 'approved') {
+                $this->gateway->refund($order->mp_payment_id);
+            }
             $order->update(['status' => Status::DESCARTADO]);
         });
     }

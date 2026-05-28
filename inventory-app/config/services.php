@@ -39,4 +39,9 @@ return [
         'url' => env('FAKE_STORE_URL', 'https://fakestoreapi.com'),
     ],
 
+    'mercado_pago' => [
+        'access_token' => env('MERCADO_PAGO_ACCESS_TOKEN'),
+        'webhook_secret' => env('MERCADO_PAGO_WEBHOOK_SECRET'),
+    ],
+
 ];
